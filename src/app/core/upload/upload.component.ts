@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ColumnService } from 'src/app/services/column.service';
 import { PlayerService } from 'src/app/services/player.service';
 import { Player } from '../../player.class';
 
@@ -9,15 +10,16 @@ import { Player } from '../../player.class';
 })
 export class UploadComponent implements OnInit {
 
-  constructor(private playerService:PlayerService) { }
+  constructor(private playerService:PlayerService, private columnService:ColumnService) { }
 
   columns:any[]=[];
-  targetColumns:string[]=[
-    'name', 'team', 'pos', 'dvp', 'ou', 'teamou', 'passtd', 
-    'rushyards', 'rushtd'
-  ];
+  targetColumns:string[]=[];
 
   ngOnInit(): void {
+    this.columnService.getColumns.subscribe(columns => {
+      this.columns = Object.values(columns);
+      this.targetColumns = this.columns.map(c=>c.internal);
+    });
   }
 
   public handleFileInput(evt) {

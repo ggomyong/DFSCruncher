@@ -5,64 +5,20 @@
           The actual rendered columns are set as a property on the row definition" -->
   
     <!-- Position Column -->
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
-      <td mat-cell *matCellDef="let player"> {{player.name}} </td>
+    <ng-container *ngFor="let column of columns" [matColumnDef]="column.internal">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> {{column.external}} </th>
+      <td mat-cell *matCellDef="let player"> {{player[column.internal]}} </td>
     </ng-container>
   
-    <!-- Name Column -->
-    <ng-container matColumnDef="team">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Team </th>
-      <td mat-cell *matCellDef="let player"> {{player.team}} </td>
-    </ng-container>
-  
-    <!-- Weight Column -->
-    <ng-container matColumnDef="pos">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Position </th>
-      <td mat-cell *matCellDef="let player"> {{player.pos}} </td>
-    </ng-container>
-  
-    <!-- Symbol Column -->
-    <ng-container matColumnDef="dvp">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> DVP </th>
-      <td mat-cell *matCellDef="let player"> {{player.dvp}} </td>
-    </ng-container>
-
-    <!-- Symbol Column -->
-    <ng-container matColumnDef="ou">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> O/U </th>
-        <td mat-cell *matCellDef="let player"> {{player.ou}} </td>
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> Delete </th>
+        <td mat-cell *matCellDef="let player">
+            
+            <button mat-icon-button >
+                <mat-icon>delete</mat-icon> 
+            </button>
+        </td>
       </ng-container>
-
-      <!-- Symbol Column -->
-    <ng-container matColumnDef="teamou">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Team O/U </th>
-        <td mat-cell *matCellDef="let player"> {{player.teamou}} </td>
-      </ng-container>
-
-      <!-- Symbol Column -->
-    <ng-container matColumnDef="passtd">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Pass TD </th>
-        <td mat-cell *matCellDef="let player"> {{player.passtd}} </td>
-      </ng-container>
-
-      <!-- Symbol Column -->
-    <ng-container matColumnDef="rushyards">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Rush Yards </th>
-        <td mat-cell *matCellDef="let player"> {{player.rushyards}} </td>
-      </ng-container>
-
-      <!-- Symbol Column -->
-    <ng-container matColumnDef="rushtd">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Rush TD </th>
-        <td mat-cell *matCellDef="let player"> {{player.rushtd}} </td>
-      </ng-container>
-
-    <ng-container matColumnDef="ttd">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> TTD </th>
-        <td mat-cell *matCellDef="let player"> {{player.ttd | number:'1.0-2'}} </td>
-      </ng-container>
-  
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>

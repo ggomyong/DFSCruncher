@@ -1,0 +1,7 @@
+<mat-form-field appearance="none" style="width: 50px;">
+    <mat-select [(value)]="value">
+        <mat-option *ngFor="let operator of operators" [value]="operator">
+            {{operator}}
+        </mat-option>
+    </mat-select>
+</mat-form-field>

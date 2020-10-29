@@ -52,6 +52,9 @@ import {FormsModule} from '@angular/forms';
 import { HeaderComponent } from './core/header/header.component';
 import { UploadComponent } from './core/upload/upload.component';
 import { LandingComponent } from './pages/landing/landing.component';
+import { StarConfigComponent } from './pages/star-config/star-config.component';
+import { QualifierSelectComponent } from './core/qualifier-select/qualifier-select.component';
+import { OperatorSelectComponent } from './core/operator-select/operator-select.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +64,13 @@ import { LandingComponent } from './pages/landing/landing.component';
 
     UploadComponent,
 
-    LandingComponent
+    LandingComponent,
+
+    StarConfigComponent,
+
+    QualifierSelectComponent,
+
+    OperatorSelectComponent
   ],
   imports: [
     BrowserModule,
