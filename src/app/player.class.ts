@@ -8,7 +8,6 @@ export class Player {
     passtd: number;
     rushyards: number;
     rushtd: number;
-    ttd: number;
     star: number;
     public Player() {
 

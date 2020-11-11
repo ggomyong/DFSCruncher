@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Column } from 'src/app/column.interface';
 
 @Component({
@@ -9,6 +9,7 @@ import { Column } from 'src/app/column.interface';
 export class OperatorSelectComponent implements OnInit {
   operators:string[]=[];
   @Input() value;
+  @Output() valueChange = new EventEmitter<string>();
   
   constructor() { }
 

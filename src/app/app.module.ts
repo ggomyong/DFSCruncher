@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -48,13 +49,14 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTreeModule} from '@angular/material/tree';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HeaderComponent } from './core/header/header.component';
 import { UploadComponent } from './core/upload/upload.component';
 import { LandingComponent } from './pages/landing/landing.component';
 import { StarConfigComponent } from './pages/star-config/star-config.component';
 import { QualifierSelectComponent } from './core/qualifier-select/qualifier-select.component';
 import { OperatorSelectComponent } from './core/operator-select/operator-select.component';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -73,6 +75,7 @@ import { OperatorSelectComponent } from './core/operator-select/operator-select.
     OperatorSelectComponent
   ],
   imports: [
+    CommonModule,
     BrowserModule,
     AppRoutingModule,
     A11yModule,
@@ -120,7 +123,9 @@ import { OperatorSelectComponent } from './core/operator-select/operator-select.
     ScrollingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
+    ToastrModule.forRoot(), // ToastrModule added
   ],
   providers: [],
   bootstrap: [AppComponent]

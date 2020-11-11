@@ -1,3 +1,17 @@
 .ruleset-table{
-    width: 350px;
+    width: 100%;
+}
+mat-card {
+    width: 95%;
+    height: 400px;
+    overflow-y: scroll;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.pull-right {
+    text-align: right;
 }

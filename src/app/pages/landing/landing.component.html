@@ -1,5 +1,17 @@
 
-<table id="main-table" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+<mat-form-field appearance="none" style="margin-top: 5px; margin-left: 5px;">
+  <mat-label>Position</mat-label>
+  <mat-select [(value)]="position" (selectionChange)="switchView()">
+    <mat-option value='qb'>QB</mat-option>
+    <mat-option value='rb'>RB</mat-option>
+    <mat-option value='rb2'>RB2</mat-option>
+    <mat-option value='wr'>WR</mat-option>
+    <mat-option value='wr2'>WR2</mat-option>
+    <mat-option value='te'>TE</mat-option>
+  </mat-select>
+</mat-form-field>
+<button mat-raised-button color="primary" (click)="recalculateStar()" style="float: right; margin-top: 10px; margin-right: 5px;">Re-calculate STAR</button>
+<table id="main-table" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" matSortActive="star" matSortDirection="desc">
 
     <!--- Note that these columns can be defined in any order.
           The actual rendered columns are set as a property on the row definition" -->
@@ -14,7 +26,7 @@
         <th mat-header-cell *matHeaderCellDef> Delete </th>
         <td mat-cell *matCellDef="let player">
             
-            <button mat-icon-button >
+            <button mat-icon-button (click)="removePlayer(player)">
                 <mat-icon>delete</mat-icon> 
             </button>
         </td>

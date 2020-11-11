@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ColumnService } from 'src/app/services/column.service';
 import { PlayerService } from 'src/app/services/player.service';
 import { Player } from '../../player.class';
+import XLSX from '../../../../node_modules/xlsx/xlsx.js';
+import { Column } from 'src/app/column.interface';
 
 @Component({
   selector: 'app-upload',
@@ -16,10 +18,6 @@ export class UploadComponent implements OnInit {
   targetColumns:string[]=[];
 
   ngOnInit(): void {
-    this.columnService.getColumns.subscribe(columns => {
-      this.columns = Object.values(columns);
-      this.targetColumns = this.columns.map(c=>c.internal);
-    });
   }
 
   public handleFileInput(evt) {
@@ -27,45 +25,155 @@ export class UploadComponent implements OnInit {
     fr.onload = (e:any) => {
         // e.target.result should contain the text
         // Column is expected to be in row #3
-        let rawData=e.target.result.split('\n')
+        /*let rawData=e.target.result.split('\n')
         this.parseColumn(rawData[3]);
         for (let i=4; i<rawData.length; i++) {
           this.parseData(rawData[i]);
-        }
+        }*/
+        let data=e.target.result;
+        data = new Uint8Array(data);
+        let workbook=XLSX.read(data, {type: 'array'});
+        let result={};
+        workbook.SheetNames.forEach(function( sheetName){
+          let roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+          if (roa.length) result[sheetName] = roa;
+        })
+        console.log(result);
         // To-Do: Write to SQL database
-        console.log(this.playerService);
+        this.handleQB(result['QB']);
+        this.handleRB(result['RB']);
+        this.handleRB2(result['RB2']);
+        this.handleTE(result['TE']);
+        this.handleWR(result['WR']);
+        this.handleWR2(result['WR2']);
     };
-    fr.readAsText(evt[0]);
+    fr.readAsArrayBuffer(evt[0]);
   }
   public openFileUpload() {
     let element: HTMLElement =document.getElementById('upload_data') as HTMLElement;
     element.click();
   }
 
-  public parseData(data:string): void {
+  private handleDEF(data) {
+
+  }
+
+  private handleQB(data:string[]) {
+    if (!data) return;
+    this.parseColumn(data[3],'qb');
+    for (let i=4; i<data.length; i++) {
+      this.parsePlayerData(data[i],'qb');
+    }
+  }
+
+  private handleRB(data:string[]) {
+    if (!data) return;
+    this.parseColumn(data[3],'rb');
+    for (let i=4; i<data.length; i++) {
+      this.parsePlayerData(data[i],'rb');
+    }
+  }
+
+  private handleRB2(data:string[]) {
+    if (!data) return;
+    this.parseColumn(data[3],'rb2');
+    for (let i=4; i<data.length; i++) {
+      this.parsePlayerData(data[i],'rb2');
+    }
+  }
+
+  private handleTE(data:string[]) {
+    if (!data) return;
+    this.parseColumn(data[3],'te');
+    for (let i=4; i<data.length; i++) {
+      this.parsePlayerData(data[i],'te');
+    }
+  }
+
+  private handleWR(data:string[]) {
+    if (!data) return;
+    this.parseColumn(data[3],'wr');
+    for (let i=4; i<data.length; i++) {
+      this.parsePlayerData(data[i],'wr');
+    }
+  }
+
+  private handleWR2(data:string[]) {
+    if (!data) return;
+    this.parseColumn(data[3],'wr2');
+    for (let i=4; i<data.length; i++) {
+      this.parsePlayerData(data[i],'wr2');
+    }
+  }
+
+
+  public parsePlayerData(data:string, playerType:string): void {
     if (this.columns==[]) {
       return null;
     }
     let player:Player=new Player();
 
-    let personal = this.CSVtoArray(data);
-    if (personal.length==0) return;
-
-    for (let i=0; i<this.targetColumns.length; i++) {
-      player[this.targetColumns[i]]=personal[this.columns[this.targetColumns[i]]];
+    for (let i=0; i<data.length; i++) {
+      let val:string=data[i];
+      
+      if (Number(val).toString()==val) {
+        if (!Number.isInteger(Number(val))) val=(Number(val).toFixed(2)).toString();
+      }
+      player[this.columns[i]]=val;
     }
     
-    this.playerService.addToList(player);
+    this.playerService.addToList(player,playerType);
   }
 
-  public parseColumn(data:string): void {
-    let columns=data.split(',');
-    for (let i=0; i<columns.length; i++) {
-      if (this.targetColumns.includes(columns[i].toLocaleLowerCase().replace(/ /g, '').replace(/\//g, ''))) {
-        this.columns[columns[i].toLocaleLowerCase().replace(/ /g, '').replace(/\//g, '')]=i;
-      }
+  private pushColumn(myColumns:Column[], myColumn:Column) {
+    const found = myColumns.some(el => el.internal === myColumn.internal);
+      if (!found) myColumns.push(myColumn);
+  }
+
+  public parseColumn(data:string, columnType:string): void {
+    this.columns=[];
+    let myColumns:Column[]=[];
+    this.pushColumn(myColumns, {internal: 'star', external: 'STAR'});
+    for (let i=0; i<data.length; i++) {
+      this.columns[i]=data[i].toLocaleLowerCase().replace(/ /g, '').replace(/\//g, '').replace(/%/g,'');
+      let myColumn:any={};
+      myColumn['internal']=this.columns[i];
+      myColumn['external']=data[i];
+      if (myColumn['internal'].charAt(0)=='w') continue;
+      if (myColumn['internal']=='matchup') continue;
+      if (myColumn['internal']=='gametime') continue;
+      if (myColumn['internal'].includes('column')) continue;
+      this.pushColumn(myColumns, myColumn);
     }
-    console.log(this.columns);
+
+    switch(columnType) {
+      case 'qb':
+        this.pushColumn(myColumns, {internal: 'ttd', external: 'TTD'});
+        this.columnService.setQb(myColumns);
+        break;
+      case 'rb':
+        this.pushColumn(myColumns, {internal: 'diff', external: 'DIFF'});
+        this.columnService.setRb(myColumns);
+        break;
+      case 'rb2':
+        this.pushColumn(myColumns, {internal: 'diff', external: 'DIFF'});
+        this.columnService.setRb2(myColumns);
+        break;
+      case 'wr':
+        this.pushColumn(myColumns, {internal: 'diff', external: 'DIFF'});
+        this.columnService.setWr(myColumns);
+        break;
+      case 'wr2':
+        
+        this.pushColumn(myColumns, {internal: 'diff', external: 'DIFF'});
+        this.columnService.setWr2(myColumns);
+        break;
+      case 'te':
+        this.pushColumn(myColumns, {internal: 'diff', external: 'DIFF'});
+        this.columnService.setTe(myColumns);
+        break;
+    }
+
   }
 
   // Return array of string values, or NULL if CSV string not well formed.

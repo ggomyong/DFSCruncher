@@ -1,5 +1,5 @@
 <mat-form-field appearance="none" style="width: 50px;">
-    <mat-select [(value)]="value">
+    <mat-select [(ngModel)]="value" (ngModelChange)="valueChange.emit(value)">
         <mat-option *ngFor="let operator of operators" [value]="operator">
             {{operator}}
         </mat-option>

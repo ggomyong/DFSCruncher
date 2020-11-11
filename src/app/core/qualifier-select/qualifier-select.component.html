@@ -1,5 +1,5 @@
 <mat-form-field appearance="none" style="width: 100px;">
-    <mat-select [(value)]="value">
+    <mat-select [(ngModel)]="value" (ngModelChange)="valueChange.emit(value)">
         <mat-option *ngFor="let column of columns" [value]="column.internal">
             {{column.external}}
         </mat-option>
