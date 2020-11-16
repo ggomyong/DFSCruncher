@@ -1,6 +1,7 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatTable } from '@angular/material/table';
 import { Ruleset } from 'src/app/ruleset.interface';
+import { ColumnService } from 'src/app/services/column.service';
 import { Star, StarService } from 'src/app/services/star.service';
 
 @Component({
@@ -11,25 +12,41 @@ import { Star, StarService } from 'src/app/services/star.service';
 export class StarConfigComponent implements OnInit {
   stars:Star[] = [];
   displayedColumns:any= [
-    'Qualifier', 'Operator', 'Value', 'delete'
+    'Qualifier', 'Operator', 'Value','point','delete'
   ];
   @ViewChildren(MatTable) matTables : QueryList<any>;
-
+  breakpoint:number=3;
   
-  constructor(private starService:StarService) { }
+  constructor(private starService:StarService, private columnService: ColumnService) { }
 
   ngOnInit(): void {
-    this.stars = this.starService.stars;
+    this.columnService.init();
+    this.starService.initStars().subscribe(data=>{
+      this.stars=data;
+    });
+    this.recalculateBreakpoint();
+  }
+
+  recalculateBreakpoint() {
+    if (window.innerWidth>1264){
+      this.breakpoint=3;
+    }
+    else if (window.innerWidth>851){
+      this.breakpoint=2;
+    }
+    else {
+      this.breakpoint=1;
+    }
   }
 
   insertRow (position: string) {
-    console.log(position);
     for (let i=0; i<this.stars.length; i++) {
       if (this.stars[i].position === position ) {
         let newRuleset:Ruleset = {
           qualifier: '',
           operator: '',
-          value: 0
+          value: '',
+          point: 1
         };
         
         this.stars[i].rulesets.push(newRuleset);
@@ -39,12 +56,7 @@ export class StarConfigComponent implements OnInit {
   }
 
   updateStar(position: string) {
-    console.log(position);
-    for (let i=0; i<this.stars.length; i++) {
-      if (this.stars[i].position == position) {
-        console.log(this.stars[i].rulesets);
-      }
-    }
+    this.starService.updateStars(this.stars);
   }
 
   deleteRuleset(position: string, ruleset: Ruleset) {

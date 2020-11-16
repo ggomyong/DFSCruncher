@@ -1,5 +1,4 @@
 export class Player {
-    name: string;
     team: string;
     pos: string;
     dvp: number;

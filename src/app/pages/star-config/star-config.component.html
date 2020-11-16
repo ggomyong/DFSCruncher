@@ -1,4 +1,4 @@
-<mat-grid-list cols="3">
+<mat-grid-list [cols]="breakpoint" (window:resize)="recalculateBreakpoint()">
     <mat-grid-tile *ngFor="let star of stars">
         <mat-card style="flex: content;">
             <mat-card-title>
@@ -23,9 +23,15 @@
                         </td>
                       </ng-container>
                       <ng-container matColumnDef="Value">
-                        <th mat-header-cell *matHeaderCellDef class="pull-right"> Value </th>
+                        <th mat-header-cell *matHeaderCellDef> Value </th>
                         <td class="pull-right" mat-cell *matCellDef="let ruleset">  
                             <input name="rulesetValue" matInput [(ngModel)]="ruleset.value">
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="point">
+                        <th mat-header-cell *matHeaderCellDef class="pull-right"> Points </th>
+                        <td class="pull-right" mat-cell *matCellDef="let ruleset">  
+                            <input type="number" name="rulesetPoint" matInput [(ngModel)]="ruleset.point">
                         </td>
                       </ng-container>
                       <ng-container matColumnDef="delete">

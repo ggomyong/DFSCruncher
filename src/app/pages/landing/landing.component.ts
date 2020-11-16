@@ -6,6 +6,11 @@ import {MatTableDataSource} from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { ColumnService } from 'src/app/services/column.service';
 import { FormControl } from '@angular/forms';
+import { ClearDataComponent, DialogData } from 'src/app/pages/clear-data/clear-data.component';
+import { MatDialog } from '@angular/material/dialog';
+import { DomSanitizer } from '@angular/platform-browser';
+import { MatIconRegistry } from '@angular/material/icon';
+
 
 @Component({
   selector: 'app-landing',
@@ -18,7 +23,12 @@ export class LandingComponent implements OnInit, AfterViewInit  {
   dataSource = new MatTableDataSource([]);
   position = 'qb';
 
-  constructor(private playerService:PlayerService, private columnService:ColumnService) { }
+  constructor(private playerService:PlayerService, private columnService:ColumnService,public dialog: MatDialog,private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer) {
+    this.matIconRegistry.addSvgIcon(
+      `calculator`,
+      this.domSanitizer.bypassSecurityTrustResourceUrl(`../../../assets/images/calculator-solid.svg`)
+    );
+   }
   
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -33,6 +43,8 @@ export class LandingComponent implements OnInit, AfterViewInit  {
       this.displayedColumns = this.columns.map(c=>c.internal);
       this.displayedColumns.push('delete');
     });
+    this.playerService.init();
+    this.columnService.init();
   }
 
   recalculateStar() {
@@ -121,9 +133,32 @@ export class LandingComponent implements OnInit, AfterViewInit  {
           this.displayedColumns.push('delete');
         });
         break;
+        case 'def':
+          this.playerService.getDef.subscribe((players)=>{
+            this.dataSource= new MatTableDataSource(Object.values(players));
+            this.dataSource.sort = this.sort;
+            this.dataSource.paginator = this.paginator;
+          });
+          this.columnService.getDef.subscribe((columns)=>{
+            this.displayedColumns=[];
+            this.columns=Object.values(columns);
+            this.displayedColumns = this.columns.map(c=>c.internal);
+            this.displayedColumns.push('delete');
+          });
+          break;
       default:
         break;
     }
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ClearDataComponent, {
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
 }

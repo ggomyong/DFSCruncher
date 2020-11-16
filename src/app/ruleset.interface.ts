@@ -1,5 +1,6 @@
 export interface Ruleset {
     qualifier: string;
     operator: string;
-    value: number;
+    value: any;
+    point: number;
 }

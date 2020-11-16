@@ -57,6 +57,9 @@ import { StarConfigComponent } from './pages/star-config/star-config.component';
 import { QualifierSelectComponent } from './core/qualifier-select/qualifier-select.component';
 import { OperatorSelectComponent } from './core/operator-select/operator-select.component';
 import { ToastrModule } from 'ngx-toastr';
+import { ClearDataComponent } from './pages/clear-data/clear-data.component';
+import { ColumnConfigComponent } from './pages/column-config/column-config.component';
+import { PositionSelectorComponent } from './core/position-selector/position-selector.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +75,13 @@ import { ToastrModule } from 'ngx-toastr';
 
     QualifierSelectComponent,
 
-    OperatorSelectComponent
+    OperatorSelectComponent,
+
+    ClearDataComponent,
+
+    ColumnConfigComponent,
+
+    PositionSelectorComponent
   ],
   imports: [
     CommonModule,

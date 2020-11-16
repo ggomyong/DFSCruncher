@@ -1,0 +1,5 @@
+<mat-chip-list *ngFor="let position of positions">
+    <mat-chip [selected]="position.selected" (click)="position.selected=!position.selected; flipSelected(position)">
+        {{position.external}}
+    </mat-chip>
+</mat-chip-list>

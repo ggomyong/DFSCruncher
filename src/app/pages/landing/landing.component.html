@@ -4,13 +4,15 @@
   <mat-select [(value)]="position" (selectionChange)="switchView()">
     <mat-option value='qb'>QB</mat-option>
     <mat-option value='rb'>RB</mat-option>
-    <mat-option value='rb2'>RB2</mat-option>
     <mat-option value='wr'>WR</mat-option>
-    <mat-option value='wr2'>WR2</mat-option>
     <mat-option value='te'>TE</mat-option>
+    <mat-option value='def'>DEF</mat-option>
   </mat-select>
 </mat-form-field>
-<button mat-raised-button color="primary" (click)="recalculateStar()" style="float: right; margin-top: 10px; margin-right: 5px;">Re-calculate STAR</button>
+
+<button mat-raised-button (click)="openDialog()" style="float: right; margin-top: 10px; margin-right: 5px;"> <mat-icon>delete_forever</mat-icon>Clear Data</button>
+<button mat-raised-button color="primary" (click)="recalculateStar()" style="float: right; margin-top: 10px; margin-right: 5px;"><mat-icon svgIcon="calculator"></mat-icon>&nbsp;Re-calculate</button>
+
 <table id="main-table" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" matSortActive="star" matSortDirection="desc">
 
     <!--- Note that these columns can be defined in any order.

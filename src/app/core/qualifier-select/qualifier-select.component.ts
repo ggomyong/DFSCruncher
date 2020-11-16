@@ -48,12 +48,14 @@ export class QualifierSelectComponent implements OnInit {
           this.columns=Object.values(columns);
         });
         break;
+      case 'def':
+        this.columnService.getDef.subscribe((columns)=>{
+          this.columns=Object.values(columns);
+        });
+        break;
       default:
         console.log(this.position);
         break;
     }
-    
-
   }
-
 }
