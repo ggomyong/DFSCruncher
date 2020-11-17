@@ -17,7 +17,8 @@ export class PositionSelectorComponent implements OnInit {
     {internal: 'qb', external: 'QB', selected: false},
     {internal: 'rb', external: 'RB', selected: false},
     {internal: 'wr', external: 'WR', selected: false},
-    {internal: 'te', external: 'TE', selected: false}
+    {internal: 'te', external: 'TE', selected: false},
+    {internal: 'def', external: 'DEF', selected: false}
   ]
   positionArray: string[] =[];
   @Output() returnArray:EventEmitter<string[]> = new EventEmitter<string[]>();
@@ -41,7 +42,7 @@ export class PositionSelectorComponent implements OnInit {
     //get the current value first
     let selected= position.selected;
     let internal = position.internal;
-    console.log(selected);
+
     if (selected && this.positionArray.indexOf(position.internal)<0){
       this.positionArray.push(internal);
     }

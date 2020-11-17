@@ -168,6 +168,12 @@ export class ColumnService {
     }
   }
 
+  addToDef(column) {
+    if (this.pushColumn(this.def_columns, column)) {
+      this.setDef(this.def_columns);
+    }
+  }
+
   addToTe(column) {
     if (this.pushColumn(this.te_columns, column)) {
       this.setQb(this.te_columns);

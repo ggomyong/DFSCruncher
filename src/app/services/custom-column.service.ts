@@ -92,6 +92,9 @@ export class CustomColumnService {
         if (this.custom_columns[i].positions.indexOf('te')>-1) {
           this.columnService.addToTe({internal: this.custom_columns[i].internal, external: this.custom_columns[i].external});
         }
+        if (this.custom_columns[i].positions.indexOf('def')>-1) {
+          this.columnService.addToDef({internal: this.custom_columns[i].internal, external: this.custom_columns[i].external});
+        }
       }
     }
   }
@@ -110,6 +113,9 @@ export class CustomColumnService {
         }
         if (columns[i].positions.indexOf('te')>-1) {
           this.columnService.addToTe({internal: columns[i].internal, external: columns[i].external});
+        }
+        if (columns[i].positions.indexOf('def')>-1) {
+          this.columnService.addToDef({internal: columns[i].internal, external: columns[i].external});
         }
       }
     }
