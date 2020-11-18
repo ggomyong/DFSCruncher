@@ -157,7 +157,7 @@ export class LandingComponent implements OnInit, AfterViewInit  {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+      //console.log('The dialog was closed');
     });
   }
 

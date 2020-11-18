@@ -112,7 +112,7 @@ export class UploadComponent implements OnInit {
 
   private handleDEF(data:string[]) {
     if (!data) return;
-    console.log(data);
+    //console.log(data);
     this.parseColumn(data[3],'def');
     for (let i=4; i<data.length; i++) {
       this.parsePlayerData(data[i],'def');

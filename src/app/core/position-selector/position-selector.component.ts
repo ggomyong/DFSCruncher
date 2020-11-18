@@ -28,7 +28,7 @@ export class PositionSelectorComponent implements OnInit {
   ngOnInit(): void {
     if (this.positionArrayInput) {
       this.positionArray=this.positionArrayInput;
-      console.log(this.positionArrayInput);
+      //console.log(this.positionArrayInput);
       for (let i=0; i<this.positions.length; i++) {
         if (this.positionArrayInput.indexOf(this.positions[i].internal)>-1) {
           this.positions[i].selected=true;

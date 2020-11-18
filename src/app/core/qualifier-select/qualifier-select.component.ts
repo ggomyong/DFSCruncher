@@ -54,7 +54,7 @@ export class QualifierSelectComponent implements OnInit {
         });
         break;
       default:
-        console.log(this.position);
+        //console.log(this.position);
         break;
     }
   }

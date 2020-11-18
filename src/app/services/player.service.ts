@@ -333,9 +333,7 @@ export class PlayerService {
     for (let i=0; i<this._customColumnList.length; i++) {
       if (this._customColumnList[i].positions.includes(player.pos.toLocaleLowerCase())) {
         try {
-          console.log(this._customColumnList[i].jitLogic);
           eval(this._customColumnList[i].jitLogic);
-          console.log(player);
         }
         catch {
           let warning=player['name'] + ' has an issue with '+this._customColumnList[i].external +' calculation.';
