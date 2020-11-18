@@ -98,6 +98,7 @@ export class PlayerService {
         this.defList.splice(this.defList.indexOf(player),1);
         this._defList.next(Object.assign({}, this.defList));
     }
+    this.saveAll();
   }
 
   public recalculateStar() {
@@ -126,7 +127,7 @@ export class PlayerService {
     this.saveTE();
 
     for (let i=0; i<this.defList.length; i++) {
-      this.teList[i]['star']=this.calculateSTAR(this.defList[i]);
+      this.defList[i]['star']=this.calculateSTAR(this.defList[i]);
     }
     this._defList.next(Object.assign({}, this.defList));
     this.saveDEF();
@@ -175,6 +176,7 @@ export class PlayerService {
         if (this.playerList[i]['name'] == player['name'] && this.playerList[i].team == player.team) {
           this.playerList.splice(i, 1); //remove the target player
           this.observablePlayers.next(Object.assign({}, this.playerList));
+          
           return true;
         }
       }
@@ -256,6 +258,14 @@ export class PlayerService {
       );
   }
 
+  public saveAll() {
+    this.saveQB();
+    this.saveDEF();
+    this.saveRB();
+    this.saveWR();
+    this.saveTE();
+  }
+
   public saveQB() {
     return this.http.post('/api/player/saveQB', this.qbList).pipe(
       retry(3), // retry a failed request up to 3 times
@@ -323,11 +333,13 @@ export class PlayerService {
     for (let i=0; i<this._customColumnList.length; i++) {
       if (this._customColumnList[i].positions.includes(player.pos.toLocaleLowerCase())) {
         try {
+          console.log(this._customColumnList[i].jitLogic);
           eval(this._customColumnList[i].jitLogic);
+          console.log(player);
         }
         catch {
           let warning=player['name'] + ' has an issue with '+this._customColumnList[i].external +' calculation.';
-          this.toastrService.error(warning, 'Calculation Error', {});
+          //this.toastrService.error(warning, 'Calculation Error', {});
         }
       }
     }
@@ -359,7 +371,7 @@ export class PlayerService {
             }
             catch {
               let warning=player['name'] + ' has an issue with '+this.columnService.getExternal(ruleset.qualifier)+' whose value is ' + player[ruleset.qualifier];
-              this.toastrService.error(warning, 'Calculation Error', {});
+              //this.toastrService.error(warning, 'Calculation Error', {});
               //console.log(warning);
             }
           }

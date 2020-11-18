@@ -1,3 +1,25 @@
 #main-table {
     width: 100%;
 }
+
+::ng-deep .mat-header-cell {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  ::ng-deep .mat-sort-header-content {
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+  
+::ng-deep  .mat-cell {
+    text-align: center;
+    justify-content:center;
+  }
+
+  .th.mat-header-cell {
+    text-align: center;
+  }
