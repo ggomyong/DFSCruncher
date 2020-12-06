@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { Column } from 'src/app/column.interface';
 import { CustomColumn, CustomColumnService } from 'src/app/services/custom-column.service';
 
 @Component({
@@ -15,7 +16,13 @@ export class ColumnConfigComponent implements OnInit {
     {internal: false, external: 'False'}
   ];
   @ViewChild(MatTable) matTable:  MatTable<any>;
-  
+  myPositions:Column[]=[
+    {internal: 'qb', external: 'QB'},
+    {internal: 'rb', external: 'RB'},
+    {internal: 'wr', external: 'WR'},
+    {internal: 'te', external: 'TE'},
+    {internal: 'def', external: 'DEF'}
+  ];
   constructor(private customColumnService: CustomColumnService) { }
 
   ngOnInit(): void {

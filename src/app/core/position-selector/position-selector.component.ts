@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Column } from 'src/app/column.interface';
 
 export interface iPosition {
   internal: string;
@@ -13,19 +14,18 @@ export interface iPosition {
 export class PositionSelectorComponent implements OnInit {
   @Input() positionArrayInput:string[];
   
-  positions:iPosition[]=[
-    {internal: 'qb', external: 'QB', selected: false},
-    {internal: 'rb', external: 'RB', selected: false},
-    {internal: 'wr', external: 'WR', selected: false},
-    {internal: 'te', external: 'TE', selected: false},
-    {internal: 'def', external: 'DEF', selected: false}
-  ]
+  positions:iPosition[]=[];
   positionArray: string[] =[];
+  @Input() iPositions: Column[];
   @Output() returnArray:EventEmitter<string[]> = new EventEmitter<string[]>();
   
   constructor() { }
 
   ngOnInit(): void {
+    for (let iPosition of this.iPositions) {
+      this.positions.push({internal: iPosition.internal, external: iPosition.external, selected: false});
+    }
+
     if (this.positionArrayInput) {
       this.positionArray=this.positionArrayInput;
       //console.log(this.positionArrayInput);
