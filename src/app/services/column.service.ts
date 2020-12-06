@@ -176,7 +176,7 @@ export class ColumnService {
 
   addToTe(column) {
     if (this.pushColumn(this.te_columns, column)) {
-      this.setQb(this.te_columns);
+      this.setTe(this.te_columns);
     }
   }
 
