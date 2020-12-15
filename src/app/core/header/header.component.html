@@ -1,6 +1,17 @@
 <mat-toolbar color="primary">
-    <a mat-button routerLink="/"><mat-icon svgIcon="football"></mat-icon>&nbsp; DFS Cruncher</a>
-    <a mat-button routerLink="/star-config"> 	<mat-icon>stars</mat-icon> Star Config</a>
-    <a mat-button routerLink="/column-config"><mat-icon>view_column</mat-icon> Column Config</a>
-    <app-upload></app-upload>
+    <a mat-button [matMenuTriggerFor]="nflMenu"><mat-icon svgIcon="football"></mat-icon>&nbsp; NFL</a>
+    <mat-menu #nflMenu="matMenu">
+        <a mat-menu-item routerLink="/" ><mat-icon svgIcon="football"></mat-icon>&nbsp; NFL Player Data</a>
+        <a mat-menu-item routerLink="/star-config"> 	<mat-icon>stars</mat-icon> Star Config</a>
+        <a mat-menu-item routerLink="/column-config"><mat-icon>view_column</mat-icon> Column Config</a>
+        <app-upload></app-upload>
+    </mat-menu>
+
+    <a mat-button [matMenuTriggerFor]="nbaMenu"><mat-icon svgIcon="basketball"></mat-icon>&nbsp; NBA</a>
+    <mat-menu #nbaMenu="matMenu">
+        <a mat-menu-item routerLink="/nba-landing" ><mat-icon svgIcon="basketball"></mat-icon>&nbsp; NBA Player Data</a>
+        <a mat-menu-item routerLink="/nba-star-config"> 	<mat-icon>stars</mat-icon> Star Config</a>
+        <a mat-menu-item routerLink="/nba-column-config"><mat-icon>view_column</mat-icon> Column Config</a>
+        <app-nba-upload></app-nba-upload>
+    </mat-menu>
 </mat-toolbar>

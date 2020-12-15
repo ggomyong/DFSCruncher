@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Which data would you like to clear?</h1>
+<div mat-dialog-content>
+    <ul>
+        <li><mat-checkbox [(ngModel)]="playerData">Player Data</mat-checkbox></li>
+        <li><mat-checkbox [(ngModel)]="columnData">Column Data</mat-checkbox></li>
+    </ul>
+    
+    
+</div>
+<div mat-dialog-actions>
+    <button mat-raised-button (click)="onNoClick()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="clearData()" cdkFocusInitial><mat-icon>delete_forever</mat-icon> Clear</button>
+</div>
+    
+    

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -14,6 +13,11 @@ export class HeaderComponent implements OnInit {
     this.matIconRegistry.addSvgIcon(
       `football`,
       this.domSanitizer.bypassSecurityTrustResourceUrl(`../../../assets/images/football-ball-solid.svg`)
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      `basketball`,
+      this.domSanitizer.bypassSecurityTrustResourceUrl(`../../../assets/images/basketball-ball-solid.svg`)
     );
   }
 

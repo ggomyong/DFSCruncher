@@ -54,7 +54,13 @@ export class QualifierSelectComponent implements OnInit {
         });
         break;
       default:
-        //console.log(this.position);
+        this.columnService.initColumnMap().subscribe(data =>{
+          this.columnService.setMap(data);
+          this.columnService.getColumnByKey(this.position).subscribe(columns=>{
+            this.columns=Object.values(columns);
+          });
+          
+        })
         break;
     }
   }

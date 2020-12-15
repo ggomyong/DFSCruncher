@@ -1,0 +1,15 @@
+.small {
+    width: 150px;
+}
+.smaller {
+    width: 100px;
+}
+.mini {
+    width: 50px;
+}
+.medium {
+    width: 240px;
+}
+textarea {
+    min-height: 100px;
+}

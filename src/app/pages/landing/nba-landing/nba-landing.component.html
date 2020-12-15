@@ -1,0 +1,39 @@
+
+<mat-form-field appearance="none" style="margin-top: 5px; margin-left: 5px;">
+    <mat-label>Position</mat-label>
+    <mat-select [(value)]="position" (selectionChange)="switchView()">
+      <mat-option value='C'>Center</mat-option>
+      <mat-option value='PF'>Power Forward</mat-option>
+      <mat-option value='SF'>Small Forward</mat-option>
+      <mat-option value='SG'>Shooting Guard</mat-option>
+      <mat-option value='PG'>Point Guard</mat-option>
+    </mat-select>
+  </mat-form-field>
+  
+  <button mat-raised-button (click)="openDialog()" style="float: right; margin-top: 10px; margin-right: 5px;"> <mat-icon>delete_forever</mat-icon>Clear Data</button>
+  <button mat-raised-button color="primary" (click)="recalculateStar()" style="float: right; margin-top: 10px; margin-right: 5px;"><mat-icon svgIcon="calculator"></mat-icon>&nbsp;Re-calculate</button>
+  
+  <table id="main-table" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" matSortActive="star" matSortDirection="desc">
+  
+      <!--- Note that these columns can be defined in any order.
+            The actual rendered columns are set as a property on the row definition" -->
+    
+      <!-- Position Column -->
+      <ng-container *ngFor="let column of columns; let i = index" [sticky]="i<=1" [matColumnDef]="column.internal">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{column.external}} </th>
+        <td mat-cell *matCellDef="let player"> {{player[column.internal]}} </td>
+      </ng-container>
+    
+        <ng-container matColumnDef="delete">
+          <th mat-header-cell *matHeaderCellDef> Delete </th>
+          <td mat-cell *matCellDef="let player">
+              
+              <button mat-icon-button (click)="removePlayer(player)">
+                  <mat-icon>delete</mat-icon> 
+              </button>
+          </td>
+        </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[10, 20, 30]" showFirstLastButtons></mat-paginator>

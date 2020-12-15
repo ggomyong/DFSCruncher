@@ -1,0 +1,55 @@
+<mat-grid-list [cols]="breakpoint" (window:resize)="recalculateBreakpoint()">
+    <mat-grid-tile *ngFor="let star of stars">
+        <mat-card style="flex: content;">
+            <mat-card-title>
+                {{star.name}}
+            </mat-card-title>
+            <mat-card-subtitle>
+                Position: {{star.position | uppercase}}
+            </mat-card-subtitle>
+            <mat-card-content>
+                <button style="align-items:flex-end;" mat-button (click)="insertRow(star.position)"><mat-icon>control_point_rounded</mat-icon> Add a Ruleset</button>
+                <table id="table_{{star.position}}" class="ruleset-table" mat-table [dataSource]="star.rulesets">
+                    <ng-container matColumnDef="Qualifier">
+                      <th mat-header-cell *matHeaderCellDef> Qualifier </th>
+                      <td mat-cell *matCellDef="let ruleset">
+                          <app-qualifier-select [(value)]="ruleset.qualifier" position="{{star.position}}"></app-qualifier-select>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Operator">
+                        <th mat-header-cell *matHeaderCellDef> Operator </th>
+                        <td mat-cell *matCellDef="let ruleset"> 
+                            <app-operator-select [(value)]="ruleset.operator"></app-operator-select>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="Value">
+                        <th class="pull-right" mat-header-cell *matHeaderCellDef> Value </th>
+                        <td class="pull-right" mat-cell *matCellDef="let ruleset">  
+                            <input name="rulesetValue" matInput [(ngModel)]="ruleset.value">
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="point">
+                        <th mat-header-cell *matHeaderCellDef class="pull-right"> Points </th>
+                        <td class="pull-right" mat-cell *matCellDef="let ruleset">  
+                            <input type="number" name="rulesetPoint" matInput [(ngModel)]="ruleset.point">
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="delete">
+                        <th mat-header-cell *matHeaderCellDef class="pull-right"> Delete </th>
+                        <td class="pull-right" mat-cell *matCellDef="let ruleset">  
+                            <button mat-icon-button (click)="deleteRuleset(star.position, ruleset)">
+                                <mat-icon>delete</mat-icon> 
+                            </button>
+                        </td>
+                      </ng-container>
+        
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </mat-card-content>
+            <mat-card-actions style="text-align: right;">
+                <button style="margin-bottom: 5px;" mat-raised-button (click)="updateStar(star.position)">Update</button>
+            </mat-card-actions>
+        </mat-card>
+    </mat-grid-tile>
+</mat-grid-list>
