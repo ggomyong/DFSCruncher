@@ -28,6 +28,6 @@
     background-color: yellow;
   }
 
-  .mat-cell:hover {
+.mat-cell:hover {
     border: 1px solid black;
   }

@@ -8,74 +8,6 @@ import { catchError, retry } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ColumnService {
-  private DEFAULT_QB_COLUMNS:Column[] = [
-    {internal: 'star', external: 'STAR'},
-    {internal: 'name', external: 'Name'},
-    {internal: 'team', external: 'Team'},
-    {internal: 'pos', external: 'Position'},
-    {internal: 'dvp', external: 'DVP'},
-    {internal: 'ou', external: 'O/U'},
-    {internal: 'passtd', external: 'Pass TD'},
-    {internal: 'rushyards', external: 'Rush Yards'},
-    {internal: 'rushtd', external: 'Rush TD'},
-    {internal: 'ttd', external: 'TTD'}
-  ];
-  private DEFAULT_RB_COLUMNS:Column[] = [
-    {internal: 'star', external: 'STAR'},
-    {internal: 'name', external: 'Name'},
-    {internal: 'team', external: 'Team'},
-    {internal: 'pos', external: 'Position'},
-    {internal: 'dvp', external: 'DVP'},
-    {internal: 'ou', external: 'O/U'},
-    {internal: 'teamou', external: 'Team O/U'},
-    {internal: 'line', external: 'Line'},
-    {internal: 'rushatt', external: 'Rush Att'},
-    {internal: 'avg', external: 'AVG'},
-    {internal: 'tgtsg', external: 'TGTs/G'}
-  ];
-  private DEFAULT_RB2_COLUMNS:Column[] = [
-    {internal: 'star', external: 'STAR'},
-    {internal: 'name', external: 'Name'},
-    {internal: 'team', external: 'Team'},
-    {internal: 'pos', external: 'Position'},
-    {internal: 'ou', external: 'O/U'},
-    {internal: 'teamou', external: 'Team O/U'},
-    {internal: 'rec', external: 'Rec'},
-    {internal: 'rectd', external: 'Rec TD'},
-    {internal: 'tgtsg', external: 'TGTs/G'}
-  ];
-  private DEFAULT_WR_COLUMNS:Column[] = [
-    {internal: 'star', external: 'STAR'},
-    {internal: 'name', external: 'Name'},
-    {internal: 'team', external: 'Team'},
-    {internal: 'pos', external: 'Position'},
-    {internal: 'ou', external: 'O/U'},
-    {internal: 'teamou', external: 'Team O/U'},
-    {internal: 'tgtsg', external: 'TGTs/G'},
-    {internal: 'rec', external: 'Rec'},
-    {internal: 'ms', external: 'MS%'},
-  ];
-  private DEFAULT_WR2_COLUMNS:Column[] = [
-    {internal: 'star', external: 'STAR'},
-    {internal: 'name', external: 'Name'},
-    {internal: 'team', external: 'Team'},
-    {internal: 'pos', external: 'Position'},
-    {internal: 'dvp', external: 'DVP'},
-    {internal: 'ou', external: 'O/U'},
-    {internal: 'teamou', external: 'Team O/U'},
-    {internal: 'tgtsg', external: 'TGTs/G'},
-    {internal: 'rec', external: 'Rec'}
-  ];
-  private DEFAULT_TE_COLUMNS:Column[] = [
-    {internal: 'star', external: 'STAR'},
-    {internal: 'name', external: 'Name'},
-    {internal: 'team', external: 'Team'},
-    {internal: 'pos', external: 'Position'},
-    {internal: 'dvp', external: 'DVP'},
-    {internal: 'teamou', external: 'Team O/U'},
-    {internal: 'tgtsg', external: 'TGTs/G'},
-    {internal: 'rec', external: 'Rec'}
-  ];
 
   private qb_columns:Column[];
   private rb_columns:Column[];
@@ -92,6 +24,9 @@ export class ColumnService {
   private _wr2Columns:BehaviorSubject<Column[]>= new BehaviorSubject([]);
   private _teColumns:BehaviorSubject<Column[]>= new BehaviorSubject([]);
   private _defColumns:BehaviorSubject<Column[]> = new BehaviorSubject([]);
+
+  private columnMap: Map<string, Column[]> = new Map<string,Column[]>(); // generic map for columns
+  private _columnMap: BehaviorSubject<Column[]> = new BehaviorSubject([]);
 
   constructor(private http : HttpClient) { 
     //this.qb_columns =this.DEFAULT_QB_COLUMNS;
@@ -122,6 +57,92 @@ export class ColumnService {
     return this._defColumns.asObservable();
   }
 
+  public initColumnMap () {
+    return this.http.get<Map<string,Column[]>>('/api/column/getMap')
+      .pipe(
+        retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
+
+  public getColumnByKey (key: string) {
+    let myColumns;
+    
+    if (key.indexOf('.')>-1) {
+      let original_key=key.split('.');
+      myColumns=this.columnMap.get(original_key[0]);
+    }
+    if (myColumns) {
+      let additional=this.columnMap.get(key);
+      
+      if (additional!=undefined && additional!=null) {
+        myColumns=myColumns.concat(this.columnMap.get(key));
+      }
+      
+    }else {
+      myColumns=this.columnMap.get(key);
+    }
+    this._columnMap.next(Object.assign({}, myColumns));
+    return this._columnMap.asObservable();
+  }
+
+  public addToMapByKey (key: string, column:Column) {
+    let columns:Column[] = this.columnMap.get(key);
+    if (columns==null || columns==undefined) {
+      columns=[];
+    }
+    if (this.pushColumn(columns, column)) {
+      this.setMapByKey(key, columns);
+    }
+  }
+
+  public setMap(data:any) {
+    for (let key in data) {
+      let value = data[key];
+      if (value && key) this.columnMap.set(key, value);
+    }
+  }
+
+  public setMapByKey(key: string, columns: Column[]) {
+    this.columnMap.set(key, columns);
+
+    const convMap = {};
+      this.columnMap.forEach((val: Column[], key: string) => {
+      if (key && val) convMap[key] = val;
+    });
+    this.http.post('/api/column/saveMap', convMap).pipe(
+      retry(3), // retry a failed request up to 3 times
+      catchError(this.handleError) // then handle the error
+    ) .subscribe((response)=>{
+      console.log(response);
+    });
+  }
+
+  private _keyToRemove: string;
+    public removeMapByKey(targetKey: string, callme) {
+      this._keyToRemove=targetKey;
+      this.columnMap.forEach((value,key, map)=>{
+        if (key.includes(this._keyToRemove)) {
+          this.columnMap.delete(key);
+        }
+      });
+
+      const convMap = {};
+      this.columnMap.forEach((val: Column[], key: string) => {
+        convMap[key] = val;
+      });
+
+      this.http.post('/api/column/saveMap', convMap).pipe(
+        retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      ) .subscribe((response)=>{
+        //console.log(response);
+        callme();
+      });
+      
+    }
+
+
   public init() {
     this.initQB().subscribe(data=>{
       this.setQb(data);
@@ -137,6 +158,9 @@ export class ColumnService {
     });
     this.initDEF().subscribe(data=>{
       this.setDef(data);
+    })
+    this.initColumnMap().subscribe(data =>{
+      this.setMap(data);
     })
   }
 

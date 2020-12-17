@@ -6,163 +6,26 @@ import { BehaviorSubject, throwError } from 'rxjs';
 
 export interface Star {
   name: string;
-    position: string;
-    rulesets: Ruleset[];
+  position: string;
+  rulesets: Ruleset[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class StarService {
-  
-  private DEFAULT_STARS = [
-    { 
-      name: 'Quarterback',
-      position: 'qb',
-      background: 'quarterback.jfif',
-      rulesets: [
-        {
-          qualifier: 'dvp',
-          operator: '>=',
-          value: 19,
-          point: 1
-        },
-        {
-          qualifier: 'ou',
-          operator: '>=',
-          value: 49,
-          point: 1
-        },
-        {
-          qualifier: 'rushyards',
-          operator: '>=',
-          value: 24,
-          point: 1
-        },
-        {
-          qualifier: 'rushtd',
-          operator: '>=',
-          value: .15,
-          point: 1
-        },
-        {
-          qualifier: 'ttd',
-          operator: '>=',
-          value: 2.2,
-          point: 1
-        },
-      ]
-    },
-    {
-      name: 'Runningback',
-      position: 'rb',
-      rulesets: [
-        {
-          qualifier: 'dvp',
-          operator: '>=',
-          value: 15,
-          point: 1
-        },
-        {
-          qualifier: 'ou',
-          operator: '>=',
-          value: 52,
-          point: 1
-        },
-        {
-          qualifier: 'line',
-          operator: '<=',
-          value: 0,
-          point: 1
-        },
-        {
-          qualifier: 'rushatt',
-          operator: '>=',
-          value: 15,
-          point: 1
-        },
-        {
-          qualifier: 'avg',
-          operator: '>=',
-          value: 18,
-          point: 1
-        },
-      ]
-    },
-    {
-      name: 'Wide Receiver',
-      position: 'wr',
-      rulesets: [
-        {
-          qualifier: 'ou',
-          operator: '>=',
-          value: 52,
-          point: 1
-        },
-        {
-          qualifier: 'teamou',
-          operator: '>=',
-          value: 26,
-          point: 1
-        },
-        {
-          qualifier: 'tgtsg',
-          operator: '>=',
-          value: 5,
-          point: 1
-        },
-        {
-          qualifier: 'rec',
-          operator: '>=',
-          value: 3.7,
-          point: 1
-        },
-        {
-          qualifier: 'ms',
-          operator: '>=',
-          value: 18,
-          point: 1
-        }
-      ]
-    },
-    {
-      name: 'Tight End',
-      position: 'te',
-      rulesets: [
-        {
-          qualifier: 'teamou',
-          operator: '>=',
-          value: 26,
-          point: 1
-        },
-        {
-          qualifier: 'dvp',
-          operator: '>=',
-          value: 20,
-          point: 1
-        },
-        {
-          qualifier: 'tgtsg',
-          operator: '>=',
-          value: 3,
-          point: 1
-        },
-        {
-          qualifier: 'rec',
-          operator: '>=',
-          value: 2,
-          point: 1
-        }
-      ]
-    }
-  ];
   public stars:Star[] = [];
+  private _starMap:Map<string, Star[]>=new Map<string, Star[]>();
+
   private _stars:BehaviorSubject<Star[]>= new BehaviorSubject([]);
 
   constructor(private http: HttpClient) { 
     //this.stars=this.DEFAULT_STARS;
     this.initStars().subscribe(data=>{
       this.updateStars(data);
+    });
+    this.initStarMap().subscribe(data=>{
+      this.setMap(data);
     });
   }
 
@@ -182,6 +45,34 @@ export class StarService {
     });
   }
 
+  public setMap(data:any) {
+    for (let key in data) {
+      let value = data[key];
+      this._starMap.set(key, value);
+    }
+  }
+
+  getStarMapByKey(key: string) {
+    this._stars.next(Object.assign({}, this._starMap.get(key)));
+    return this._stars.asObservable();
+  }
+
+  updateStarMapByKey(key: string, stars: Star[]){
+    this._starMap.set(key, stars);
+
+    const convMap = {};
+      this._starMap.forEach((val: Star[], key: string) => {
+        convMap[key] = val;
+      });
+
+    return this.http.post('/api/star/saveMap', convMap).pipe(
+      retry(3), // retry a failed request up to 3 times
+      catchError(this.handleError) // then handle the error
+    ) .subscribe((response)=>{
+      console.log(response);
+    });
+  }
+
   initStars() {
     return this.http.get<Star[]>('/api/star/get')
       .pipe(
@@ -189,6 +80,15 @@ export class StarService {
         catchError(this.handleError) // then handle the error
       );
   }
+
+  initStarMap() {
+    return this.http.get<Star[]>('/api/star/getMap')
+      .pipe(
+        retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
+
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.

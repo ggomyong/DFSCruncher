@@ -60,6 +60,11 @@ import { ToastrModule } from 'ngx-toastr';
 import { ClearDataComponent } from './pages/clear-data/clear-data.component';
 import { ColumnConfigComponent } from './pages/column-config/column-config.component';
 import { PositionSelectorComponent } from './core/position-selector/position-selector.component';
+import { NbaUploadComponent } from './core/upload/nba-upload/nba-upload.component';
+import { NbaLandingComponent } from './pages/landing/nba-landing/nba-landing.component';
+import { NbaStarConfigComponent } from './pages/star-config/nba-star-config/nba-star-config.component';
+import { NbaColumnConfigComponent } from './pages/column-config/nba-column-config/nba-column-config.component';
+import { NbaClearDataComponent } from './pages/clear-data/nba-clear-data/nba-clear-data.component';
 
 @NgModule({
   declarations: [
@@ -81,7 +86,17 @@ import { PositionSelectorComponent } from './core/position-selector/position-sel
 
     ColumnConfigComponent,
 
-    PositionSelectorComponent
+    PositionSelectorComponent,
+
+    NbaUploadComponent,
+
+    NbaLandingComponent,
+
+    NbaStarConfigComponent,
+
+    NbaColumnConfigComponent,
+
+    NbaClearDataComponent
   ],
   imports: [
     CommonModule,

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject, of, Subject, throwError } from 'rxjs';
 import { Player } from '../player.class';
 import { ColumnService } from './column.service';
-import { StarService } from './star.service';
+import { Star, StarService } from './star.service';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, retry } from 'rxjs/operators';
@@ -35,12 +34,114 @@ export class PlayerService {
 
   private _customColumnList:CustomColumn[];
 
+  private playerMap: Map<string, Player[]> = new Map<string,Player[]>(); // generic map for players
+  private _playerMap: BehaviorSubject<Player[]> = new BehaviorSubject([]);
+  private _star:Star[] = [];
+  private _customColumnsMap:Map<string,CustomColumn[]>=new Map<string,CustomColumn[]>();
+
   constructor(private starService:StarService, private columnService: ColumnService, private toastrService:ToastrService,private customColumnService:CustomColumnService,
     private http : HttpClient) { 
       this.customColumnService.getColumns.subscribe(data=>{
         this._customColumnList=Object.values(data);
       });
+
+      this.customColumnService.initColumnMap().subscribe(data=>{
+        this.customColumnService.setMap(data);
+        this.customColumnService.getColumnMapByKey('nba').subscribe(data =>{
+          this._customColumnsMap.set('nba', Object.values(data));
+        }); 
+      });
     }
+
+    public initPlayerMap () {
+      return this.http.get<Map<string,Player[]>>('/api/player/getMap')
+        .pipe(
+          retry(3), // retry a failed request up to 3 times
+          catchError(this.handleError) // then handle the error
+        );
+    }
+  
+    public getPlayerByKey (key: string) {
+      this._playerMap.next(Object.assign({}, this.playerMap.get(key)));
+      return this._playerMap.asObservable();
+    }
+  
+    public addToMapByKey (key: string, player:Player) {
+      let players:Player[] = this.playerMap.get(key);
+      if (players==null || players == undefined){
+        players=[];
+      }
+      players.push(player);
+      this.playerMap.set(key, players);
+    }
+  
+    public setMap(data:any) {
+      for (let key in data) {
+        let value = data[key];
+        for (let i=0; i<value.length; i++) {
+          if (value[i].pos && !value[i].pos.includes('.')) {
+            value[i].pos=key;
+          }
+          value[i].star=this.calculateSTAR(value[i]);
+        }
+        this.playerMap.set(key, value);
+      }
+    }
+  
+    public setMapByKey(key: string, players: Player[]) {
+      this.playerMap.set(key, players);
+      
+      const convMap = {};
+      this.playerMap.forEach((val: Player[], key: string) => {
+        convMap[key] = val;
+      });
+
+      this.http.post('/api/player/saveMap', convMap).pipe(
+        retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      ) .subscribe((response)=>{
+        console.log(response);
+      });
+    }
+
+    public saveMapByKey(key: string) {
+      const convMap = {};
+      this.playerMap.forEach((val: Player[], key: string) => {
+        convMap[key] = val;
+      });
+      this.http.post('/api/player/saveMap', convMap).pipe(
+        retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      ) .subscribe((response)=>{
+        console.log(response);
+        location.reload();
+      });
+    }
+
+    private _keyToRemove: string;
+    public removeMapByKey(targetKey: string, callme) {
+      this._keyToRemove=targetKey;
+      this.playerMap.forEach((value,key, map)=>{
+        if (key.includes(this._keyToRemove)) {
+          this.playerMap.delete(key);
+        }
+      });
+
+      const convMap = {};
+      this.playerMap.forEach((val: Player[], key: string) => {
+        convMap[key] = val;
+      });
+
+      this.http.post('/api/player/saveMap', convMap).pipe(
+        retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      ) .subscribe((response)=>{
+        //console.log(response);
+        callme();
+      });
+      
+    }
+  
 
   get getPlayers() {
     return this.observablePlayers.asObservable();
@@ -69,6 +170,9 @@ export class PlayerService {
   }
 
   public removePlayer(player:Player) {
+    if (player.pos.includes('.')) {
+      return this.newRemovePlayer(player);
+    }
     switch(player.pos.toLocaleLowerCase()) {
       case 'qb':
         this.qbList.splice(this.qbList.indexOf(player),1);
@@ -101,7 +205,25 @@ export class PlayerService {
     this.saveAll();
   }
 
+  private newRemovePlayer(player:Player): void {
+    let key= player.pos;
+    let players = this.playerMap.get(key);
+    for (let i=0; i<players.length; i++) {
+      let target:Player = players[i];
+
+      if (target['name']==player['name']) {
+        players.splice(i,1);
+        break;
+      }
+    }
+    this.playerMap.set(key, players);
+    this.saveMapByKey('');
+    return;
+  }
+
   public recalculateStar() {
+    this.newRecalculateStar();
+
     for (let i=0; i<this.qbList.length; i++) {
       this.qbList[i]['star']=this.calculateSTAR(this.qbList[i]);
     }
@@ -241,6 +363,16 @@ export class PlayerService {
       this.defList=data;
       this._defList.next(Object.assign({}, this.defList));
     });
+    this.starService.initStarMap().subscribe(data=>{
+      this.starService.setMap(data);
+      this.starService.getStarMapByKey('nba').subscribe(data=>{
+        this._star=Object.values(data);
+        this.initPlayerMap().subscribe(data=>{
+          this.setMap(data);
+        });
+      });
+    });
+    
   }
   public initQB() {
     return this.http.get<Player[]>('/api/player/getQB')
@@ -328,7 +460,81 @@ export class PlayerService {
       console.log(response);
     });
   }
+  private newRecalculateStar():void {
+    this.playerMap.forEach((val: Player[], key: string) => {
+        for (let i=0; i<val.length; i++) {
+          let player=val[i];
+          player.star=this.calculateSTAR(player);
+          val[i]=player;
+        }
+        this.playerMap.set(key, val);
+      });
+      this.saveMapByKey('');
+  }
+  private newStar(player): number {
+    let star: number=0;
+
+    let customColumns=this._customColumnsMap.get(player.pos.split('.')[0]);
+    if (customColumns) {
+      for (let i=0; i<customColumns.length; i++) {
+        if (customColumns[i].positions.includes(player.pos)) {
+          try {
+            eval(customColumns[i].jitLogic);
+          }
+          catch {
+            let warning=player['name'] + ' has an issue with '+customColumns[i].external +' calculation.';
+            //this.toastrService.error(warning, 'Calculation Error', {});
+          }
+        }
+      }
+    }
+    
+
+    let stars=this._star
+    for (let i=0; i<stars.length; i++) {
+          
+      if (stars[i].position.toLocaleLowerCase() == player.pos.toLocaleLowerCase()) {
+        let rulesets =stars[i].rulesets;
+        for (let j=0; j<rulesets.length; j++) {
+          let ruleset = rulesets[j];
+
+          let points:number = ruleset.point;
+
+          if (ruleset.operator.includes('[')) {
+            if (ruleset.operator=='[') {
+              if (player[ruleset.qualifier].includes(ruleset.value)) {
+                star=star+points;
+              }
+            }
+            else if (ruleset.operator=='![') {
+              if (!player[ruleset.qualifier].includes(ruleset.value)) {
+                star=star+points;
+              }
+            }
+          }
+          else {
+            try {
+              if (eval(player[ruleset.qualifier] + ruleset.operator + ruleset.value)) {
+                star=star+points;
+              }
+            }
+            catch {
+              let warning=player['name'] + ' has an issue with '+this.columnService.getExternal(ruleset.qualifier)+' whose value is ' + player[ruleset.qualifier];
+              //this.toastrService.error(warning, 'Calculation Error', {});
+              //console.log(warning);
+            }
+          }
+        }
+      }
+    }
+    return star;
+  }
   private calculateSTAR(player:Player):number {
+    if (!player || !player.pos) return 0;
+    if (player.pos && player.pos.includes('.')) {
+      return this.newStar(player);
+    }
+
     let star: number=0;
     for (let i=0; i<this._customColumnList.length; i++) {
       if (this._customColumnList[i].positions.includes(player.pos.toLocaleLowerCase())) {
