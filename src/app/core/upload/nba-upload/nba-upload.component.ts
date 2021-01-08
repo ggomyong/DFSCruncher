@@ -36,7 +36,8 @@ export class NbaUploadComponent implements OnInit {
         //blow up any record
         this.handleRecords(result['fanduel']);
         this.customColumnService.updateColumns();
-        this.playerService.recalculateStar();
+        this.playerService.newRecalculateStar();
+        location.reload();
     };
     fr.readAsArrayBuffer(evt[0]);
   }
@@ -94,6 +95,17 @@ export class NbaUploadComponent implements OnInit {
       if (myColumn['internal']=='gametime') continue;
       if (myColumn['internal'].includes('column') && myColumn['internal']!='column1') continue;
       if (myColumn['internal']=='-') continue;
+      if (myColumn['internal']=='2x') continue;
+      if (myColumn['internal']=='3x') continue;
+      if (myColumn['internal']=='4x') continue;
+      if (myColumn['internal']=='5x') continue;
+      if (myColumn['internal']=='6x') continue;
+      if (myColumn['internal']=='7x') continue;
+      if (myColumn['internal']=='8x') continue;
+      if (myColumn['internal']=='1g') continue;
+      if (myColumn['internal']=='3g') continue;
+      if (myColumn['internal']=='5g') continue;
+      if (myColumn['internal']=='10g') continue;
       //console.log(myColumn);
       this.pushColumn(myColumns, myColumn);
     }

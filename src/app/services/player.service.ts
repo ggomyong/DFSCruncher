@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, retry } from 'rxjs/operators';
 import { CustomColumn, CustomColumnService } from './custom-column.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +40,9 @@ export class PlayerService {
   private _star:Star[] = [];
   private _customColumnsMap:Map<string,CustomColumn[]>=new Map<string,CustomColumn[]>();
 
-  constructor(private starService:StarService, private columnService: ColumnService, private toastrService:ToastrService,private customColumnService:CustomColumnService,
+  public lastPosition: string ='';
+
+  constructor(private router:Router, private starService:StarService, private columnService: ColumnService, private toastrService:ToastrService,private customColumnService:CustomColumnService,
     private http : HttpClient) { 
       this.customColumnService.getColumns.subscribe(data=>{
         this._customColumnList=Object.values(data);
@@ -114,7 +117,14 @@ export class PlayerService {
         catchError(this.handleError) // then handle the error
       ) .subscribe((response)=>{
         console.log(response);
-        location.reload();
+        /*if (this.lastPosition!='') {
+          this.router.navigate(['/nba-landing'],{queryParams: {position: this.lastPosition}});
+          window.setTimeout(()=>{location.reload()}, 500)
+        }
+        else {
+          location.reload();
+        }*/
+        
       });
     }
 
@@ -222,8 +232,7 @@ export class PlayerService {
   }
 
   public recalculateStar() {
-    this.newRecalculateStar();
-
+    //this.newRecalculateStar();
     for (let i=0; i<this.qbList.length; i++) {
       this.qbList[i]['star']=this.calculateSTAR(this.qbList[i]);
     }
@@ -460,7 +469,7 @@ export class PlayerService {
       console.log(response);
     });
   }
-  private newRecalculateStar():void {
+  public newRecalculateStar():void {
     this.playerMap.forEach((val: Player[], key: string) => {
         for (let i=0; i<val.length; i++) {
           let player=val[i];

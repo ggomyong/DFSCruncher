@@ -6,6 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Player } from 'src/app/player.class';
 import { ColumnService } from 'src/app/services/column.service';
@@ -30,11 +31,17 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
 
   @ViewChild(MatTable) matTable:  MatTable<any>;
   
-  constructor(private cdref: ChangeDetectorRef, private playerService:PlayerService, private columnService:ColumnService,public dialog: MatDialog,private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer) {
+  constructor(private route: ActivatedRoute, private cdref: ChangeDetectorRef, private playerService:PlayerService, private columnService:ColumnService,public dialog: MatDialog,private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer) {
     this.matIconRegistry.addSvgIcon(
       `calculator`,
       this.domSanitizer.bypassSecurityTrustResourceUrl(`../../../assets/images/calculator-solid.svg`)
     );
+    this.route.queryParams.subscribe(params => {
+      this.position = params['position'];
+      if (this.position==null || this.position == undefined || this.position=='') {
+        this.position='C';
+      }
+    });
    }
   ngOnDestroy(): void {
     this.columnSubscription.unsubscribe();
@@ -80,7 +87,9 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
     this.playerService.recalculateStar();
   }
   removePlayer(player:Player) {
+    this.playerService.lastPosition=this.position;
     this.playerService.removePlayer(player);
+    this.switchView();
   }
   switchView() {
     this.playerService.getPlayerByKey('nba.'+this.position).subscribe(players=>{
