@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { retry } from 'rxjs/operators';
+import { Column } from '../column.interface';
 import { ColumnService } from './column.service';
 
 export interface CustomColumn {
@@ -168,5 +169,13 @@ export class CustomColumnService {
     ) .subscribe((response)=>{
       console.log(response);
     });
+  }
+
+  hideColumns(column: Column){
+    // pass the column, return true if column needs to be hidden, false otherwise.
+    const found = this.custom_columns.filter((node)=>{
+      return (node.internal == column.internal && node.external == column.external && !node.display)
+    })
+    return found.length>0
   }
 }

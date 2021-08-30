@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Player } from 'src/app/player.class';
 import { ColumnService } from 'src/app/services/column.service';
+import { CustomColumnService } from 'src/app/services/custom-column.service';
 import { PlayerService } from 'src/app/services/player.service';
 import { NbaClearDataComponent } from '../../clear-data/nba-clear-data/nba-clear-data.component';
 
@@ -31,7 +32,8 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
 
   @ViewChild(MatTable) matTable:  MatTable<any>;
   
-  constructor(private route: ActivatedRoute, private cdref: ChangeDetectorRef, private playerService:PlayerService, private columnService:ColumnService,public dialog: MatDialog,private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer) {
+  constructor(private route: ActivatedRoute, private cdref: ChangeDetectorRef, private playerService:PlayerService, private columnService:ColumnService,public dialog: MatDialog,private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer
+    ,private customColumnService: CustomColumnService, protected readonly cdRef: ChangeDetectorRef) {
     this.matIconRegistry.addSvgIcon(
       `calculator`,
       this.domSanitizer.bypassSecurityTrustResourceUrl(`../../../assets/images/calculator-solid.svg`)
@@ -72,13 +74,16 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
 
     this.columnService.initColumnMap().subscribe(data =>{
       this.columnService.setMap(data);
-      
-      this.columnSubscription=this.columnService.getColumnByKey('nba.C').subscribe(columns=>{
-        this.displayedColumns=[];
-        this.columns=Object.values(columns);
-        this.displayedColumns = this.columns.map(c=>c.internal);
-        this.displayedColumns.push('delete');
+      this.customColumnService.initColumns().subscribe(()=>{
+        this.columnSubscription=this.columnService.getColumnByKey('nba.C').subscribe(columns=>{
+          this.displayedColumns=[];
+          this.columns=Object.values(columns);
+          this.displayedColumns = this.columns.map(c=>c.internal);
+          this.displayedColumns.push('delete');
+          this.fixColumns();
+        });
       });
+      
       window.setTimeout(()=>this.switchView(), 1000);
     })
   }
@@ -102,6 +107,7 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
       this.columns=Object.values(columns);
       this.displayedColumns = this.columns.map(c=>c.internal);
       this.displayedColumns.push('delete');
+      this.fixColumns();
     });
   }
 
@@ -113,5 +119,13 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       //console.log('The dialog was closed');
     });
+  }
+
+  fixColumns() {
+    this.columns = this.columns.filter((node)=>{
+      return !this.customColumnService.hideColumns(node)
+    })
+    this.displayedColumns = this.columns.map(c=>c.internal);
+    this.cdRef.detectChanges();
   }
 }

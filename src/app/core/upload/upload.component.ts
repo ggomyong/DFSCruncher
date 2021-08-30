@@ -153,8 +153,6 @@ export class UploadComponent implements OnInit {
       myColumn['internal']=this.columns[i];
       myColumn['external']=data[i];
       if (myColumn['internal'].charAt(0)=='w') continue;
-      if (myColumn['internal']=='matchup') continue;
-      if (myColumn['internal']=='gametime') continue;
       if (myColumn['internal'].includes('column')) continue;
       if (myColumn['internal']=='-') continue;
       //console.log(myColumn);

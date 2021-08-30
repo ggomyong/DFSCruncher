@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Player } from '../../player.class';
 import { PlayerService } from 'src/app/services/player.service';
 import {MatSort} from '@angular/material/sort';
@@ -10,6 +10,7 @@ import { ClearDataComponent, DialogData } from 'src/app/pages/clear-data/clear-d
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
+import { CustomColumnService } from 'src/app/services/custom-column.service';
 
 
 @Component({
@@ -23,7 +24,8 @@ export class LandingComponent implements OnInit, AfterViewInit  {
   dataSource = new MatTableDataSource([]);
   position = 'qb';
 
-  constructor(private playerService:PlayerService, private columnService:ColumnService,public dialog: MatDialog,private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer) {
+  constructor(private playerService:PlayerService, private columnService:ColumnService,public dialog: MatDialog,private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer
+    , private customColumnService: CustomColumnService, protected readonly cdRef: ChangeDetectorRef) {
     this.matIconRegistry.addSvgIcon(
       `calculator`,
       this.domSanitizer.bypassSecurityTrustResourceUrl(`../../../assets/images/calculator-solid.svg`)
@@ -37,14 +39,18 @@ export class LandingComponent implements OnInit, AfterViewInit  {
     this.switchView();
   }
   ngOnInit(): void {
-    this.columnService.getQb.subscribe((columns)=>{
-      this.displayedColumns=[];
-      this.columns=Object.values(columns);
-      this.displayedColumns = this.columns.map(c=>c.internal);
-      this.displayedColumns.push('delete');
-    });
-    this.playerService.init();
-    this.columnService.init();
+    this.customColumnService.initColumns().subscribe(()=>{
+      this.columnService.getQb.subscribe((columns)=>{
+        this.displayedColumns=[];
+        this.columns=Object.values(columns);
+        this.displayedColumns = this.columns.map(c=>c.internal);
+        this.displayedColumns.push('delete');
+        this.fixColumns();
+      });
+      this.playerService.init();
+      this.columnService.init();
+    })
+    
   }
 
   recalculateStar() {
@@ -149,6 +155,15 @@ export class LandingComponent implements OnInit, AfterViewInit  {
       default:
         break;
     }
+    this.fixColumns();
+  }
+
+  fixColumns() {
+    this.columns = this.columns.filter((node)=>{
+      return !this.customColumnService.hideColumns(node)
+    })
+    this.displayedColumns = this.columns.map(c=>c.internal);
+    this.cdRef.detectChanges();
   }
 
   openDialog(): void {
