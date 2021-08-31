@@ -543,7 +543,6 @@ export class PlayerService {
     if (player.pos && player.pos.includes('.')) {
       return this.newStar(player);
     }
-
     let star: number=0;
     for (let i=0; i<this._customColumnList.length; i++) {
       if (this._customColumnList[i].positions.includes(player.pos.toLocaleLowerCase())) {

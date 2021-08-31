@@ -128,13 +128,11 @@ export class UploadComponent implements OnInit {
 
     for (let i=0; i<data.length; i++) {
       let val:string=data[i];
-      
       if (Number(val).toString()==val) {
         if (!Number.isInteger(Number(val))) val=(Number(val).toFixed(2)).toString();
       }
       player[this.columns[i]]=val;
     }
-    
     this.playerService.addToList(player,playerType);
   }
 

@@ -67,7 +67,6 @@ export class NbaColumnConfigComponent implements OnInit {
 
   save() {
     //this.customColumnService.setColumns(this.dataSource);
-    console.log(this.dataSource)
     this.customColumnService.setColumnMapByKey('nba',this.dataSource);
   }
 

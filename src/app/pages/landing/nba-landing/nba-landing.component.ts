@@ -79,7 +79,6 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
           this.displayedColumns=[];
           this.columns=Object.values(columns);
           this.displayedColumns = this.columns.map(c=>c.internal);
-          this.displayedColumns.push('delete');
           this.fixColumns();
         });
       });
@@ -126,6 +125,7 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
       return !this.customColumnService.hideColumns(node)
     })
     this.displayedColumns = this.columns.map(c=>c.internal);
+    this.displayedColumns.push('delete');
     this.cdRef.detectChanges();
   }
 }
