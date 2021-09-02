@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { stringify } from '@angular/compiler/src/util';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { retry } from 'rxjs/operators';
@@ -171,11 +172,26 @@ export class CustomColumnService {
     });
   }
 
-  hideColumns(column: Column){
+  hideColumns(column: Column, game?: string){
     // pass the column, return true if column needs to be hidden, false otherwise.
-    const found = this.custom_columns.filter((node)=>{
-      return (node.internal == column.internal && node.external == column.external && !node.display)
-    })
-    return found.length>0
+    if (game && game.length>0) {
+      if (this.custom_columnMap && this.custom_columnMap.get(game)) {
+        const found=this.custom_columnMap.get(game).filter((node)=>{
+          return (node.internal == column.internal && node.external == column.external && !node.display)
+        })
+        return found.length>0
+      }
+      return false;
+    }
+    else {
+      if (this.custom_columns) {
+        const found = this.custom_columns.filter((node)=>{
+          return (node.internal == column.internal && node.external == column.external && !node.display)
+        })
+        return found.length>0
+      }
+      return false;
+    }
+    
   }
 }
