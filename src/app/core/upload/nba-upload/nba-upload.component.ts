@@ -91,8 +91,6 @@ export class NbaUploadComponent implements OnInit {
       myColumn['internal']=this.columns[i];
       myColumn['external']=data[i];
       if (myColumn['internal'].charAt(0)=='w') continue;
-      if (myColumn['internal']=='matchup') continue;
-      if (myColumn['internal']=='gametime') continue;
       if (myColumn['internal'].includes('column') && myColumn['internal']!='column1') continue;
       if (myColumn['internal']=='-') continue;
       if (myColumn['internal']=='2x') continue;
@@ -106,6 +104,9 @@ export class NbaUploadComponent implements OnInit {
       if (myColumn['internal']=='3g') continue;
       if (myColumn['internal']=='5g') continue;
       if (myColumn['internal']=='10g') continue;
+      if (myColumn['internal']=='column1') {
+        myColumn['external']='STDDEV'
+      } 
       //console.log(myColumn);
       this.pushColumn(myColumns, myColumn);
     }

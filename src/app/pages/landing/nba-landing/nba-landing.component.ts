@@ -74,7 +74,7 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
 
     this.columnService.initColumnMap().subscribe(data =>{
       this.columnService.setMap(data);
-      this.customColumnService.initColumns().subscribe(()=>{
+      this.customColumnService.initColumnMap().subscribe(()=>{
         this.columnSubscription=this.columnService.getColumnByKey('nba.C').subscribe(columns=>{
           this.displayedColumns=[];
           this.columns=Object.values(columns);
@@ -122,7 +122,7 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
 
   fixColumns() {
     this.columns = this.columns.filter((node)=>{
-      return !this.customColumnService.hideColumns(node)
+      return !this.customColumnService.hideColumns(node, 'nba')
     })
     this.displayedColumns = this.columns.map(c=>c.internal);
     this.displayedColumns.push('delete');
