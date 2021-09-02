@@ -37,7 +37,7 @@ export class NbaUploadComponent implements OnInit {
         this.handleRecords(result['fanduel']);
         this.customColumnService.updateColumns();
         this.playerService.newRecalculateStar();
-        location.reload();
+        //location.reload();
     };
     fr.readAsArrayBuffer(evt[0]);
   }
