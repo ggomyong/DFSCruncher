@@ -38,6 +38,9 @@ export class NbaUploadComponent implements OnInit {
         this.customColumnService.updateColumns();
         this.playerService.newRecalculateStar();
         //location.reload();
+        window.setTimeout(()=>{
+          location.reload();
+        }, 5000);
     };
     fr.readAsArrayBuffer(evt[0]);
   }
