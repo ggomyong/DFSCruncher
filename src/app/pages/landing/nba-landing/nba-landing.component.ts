@@ -121,9 +121,11 @@ export class NbaLandingComponent implements AfterViewInit,OnDestroy {
   }
 
   fixColumns() {
+    console.log(this.columns);
     this.columns = this.columns.filter((node)=>{
       return !this.customColumnService.hideColumns(node, 'nba')
     })
+    console.log(this.columns);
     this.displayedColumns = this.columns.map(c=>c.internal);
     this.displayedColumns.push('delete');
     this.cdRef.detectChanges();

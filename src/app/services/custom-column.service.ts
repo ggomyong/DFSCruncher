@@ -176,6 +176,8 @@ export class CustomColumnService {
     // pass the column, return true if column needs to be hidden, false otherwise.
     if (game && game.length>0) {
       if (this.custom_columnMap && this.custom_columnMap.get(game)) {
+        console.log(this.custom_columnMap.get(game));
+        console.log(game);
         const found=this.custom_columnMap.get(game).filter((node)=>{
           return (node.internal == column.internal && node.external == column.external && !node.display)
         })
