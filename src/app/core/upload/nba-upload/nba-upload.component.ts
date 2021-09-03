@@ -40,7 +40,7 @@ export class NbaUploadComponent implements OnInit {
         //location.reload();
         window.setTimeout(()=>{
           location.reload();
-        }, 5000);
+        }, 9000);
     };
     fr.readAsArrayBuffer(evt[0]);
   }
@@ -58,19 +58,42 @@ export class NbaUploadComponent implements OnInit {
     this.playerService.saveMapByKey('nba');
     //location.reload();
   }
-
+  private convertExcelDecimalToTime(value: string) {
+    let hour,minute,seconds;
+    const time = Number((Number(value)*24).toFixed(2));
+    const decimals = time.toString().split('.')
+    let meridian;
+    if (decimals[1]) {
+      minute =  Number(decimals[1])*6;
+    }
+    else {
+      minute = '00'
+    }
+    if (time>12) {
+      hour = Math.trunc(time-12);
+      meridian = 'PM'
+    }
+    else {
+      hour = Math.trunc(time);
+      meridian = 'AM'
+    }
+    return hour+':'+minute+' ' +meridian;
+  }
 
   public parsePlayerData(data:string, playerType:string): void {
     if (this.columns==[]) {
       return null;
     }
     let player:Player=new Player();
-    
     for (let i=0; i<data.length; i++) {
       let val:string=data[i];
-      
-      if (Number(val).toString()==val) {
-        if (!Number.isInteger(Number(val))) val=(Number(val).toFixed(2)).toString();
+      if (!isNaN(Number(val)) && Number(val).toString()==val) {
+        if (this.columns[i]=='gametime') {
+          val = this.convertExcelDecimalToTime(val);
+        }
+        else if (!Number.isInteger(Number(val))) {
+          val=(Number(val).toFixed(2)).toString();
+        }
       }
       if (player[this.columns[i]]==undefined || player[this.columns[i]]==null)player[this.columns[i]]=val;
     }
