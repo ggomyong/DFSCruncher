@@ -78,9 +78,9 @@ export class UploadComponent implements OnInit {
 
   private handleRB2(data:string[]) {
     if (!data) return;
-    this.parseColumn(data[3],'rb2');
+    this.parseColumn(data[3],'rb');
     for (let i=4; i<data.length; i++) {
-      this.parsePlayerData(data[i],'rb2');
+      this.parsePlayerData(data[i],'rb');
     }
   }
 
@@ -104,16 +104,16 @@ export class UploadComponent implements OnInit {
 
   private handleWR2(data:string[]) {
     if (!data) return;
-    this.parseColumn(data[3],'wr2');
+    this.parseColumn(data[3],'wr');
     for (let i=4; i<data.length; i++) {
-      this.parsePlayerData(data[i],'wr2');
+      this.parsePlayerData(data[i],'wr');
     }
   }
 
   private handleDEF(data:string[]) {
     if (!data) return;
     //console.log(data);
-    this.parseColumn(data[3],'def');
+    this.parseColumn(data[1],'def');
     for (let i=4; i<data.length; i++) {
       this.parsePlayerData(data[i],'def');
     }
@@ -121,7 +121,7 @@ export class UploadComponent implements OnInit {
 
 
   public parsePlayerData(data:string, playerType:string): void {
-    if (this.columns==[]) {
+    if (this.columns.length==0) {
       return null;
     }
     let player:Player=new Player();
